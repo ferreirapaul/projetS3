@@ -2,8 +2,14 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">360</property>
+    <property name="step-increment">0.10</property>
+    <property name="page-increment">0.10</property>
+  </object>
   <object class="GtkWindow" id="Window">
     <property name="can-focus">False</property>
+    <property name="title" translatable="yes">OCR</property>
     <property name="default-width">750</property>
     <property name="default-height">400</property>
     <child>
@@ -44,7 +50,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkFileChooserButton">
+              <object class="GtkFileChooserButton" id ="file">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="title" translatable="yes"/>
@@ -59,7 +65,7 @@
               <object class="GtkAlignment">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-top">300</property>
+                <property name="margin-top">66</property>
                 <child>
                   <placeholder/>
                 </child>
@@ -68,6 +74,50 @@
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">11</property>
+                <property name="label" translatable="yes">Rotate Manualy</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSpinButton">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="adjustment">adjustment1</property>
+                <property name="digits">2</property>
+                <property name="snap-to-ticks">True</property>
+                <property name="update-policy">if-valid</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">5</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkAlignment">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-top">210</property>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">6</property>
               </packing>
             </child>
             <child>
@@ -80,7 +130,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">4</property>
+                <property name="position">7</property>
               </packing>
             </child>
           </object>
@@ -90,9 +140,9 @@
           </packing>
         </child>
         <child>
-          <object class="GtkImage">
+          <object class="GtkImage" id = "img">
             <property name="visible">True</property>
-            <property name="can-focus">False</property>
+            <property name="can-focus">True</property>
           </object>
           <packing>
             <property name="resize">True</property>
