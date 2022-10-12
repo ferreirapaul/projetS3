@@ -2,54 +2,58 @@
 #include <gtk/gtk.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-
+#include <err.h>
 
 #define UI_FILE "UI.glade"
 
 GtkBuilder *builder;
 GtkWidget *window;
+GtkWidget *image = NULL;
 
 void put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, 
                 guchar blue, guchar alpha)
 {
-  int width, height, rowstride, n_channels;
-  guchar *pixels, *p;
+    int width, height, rowstride, n_channels;
+    guchar *pixels, *p;
 
-  n_channels = gdk_pixbuf_get_n_channels (pixbuf);
+    n_channels = gdk_pixbuf_get_n_channels (pixbuf);
 
-  g_assert (gdk_pixbuf_get_colorspace (pixbuf) == GDK_COLORSPACE_RGB);
-  g_assert (gdk_pixbuf_get_bits_per_sample (pixbuf) == 8);
-  g_assert (gdk_pixbuf_get_has_alpha (pixbuf));
-  g_assert (n_channels == 4);
+    g_assert (gdk_pixbuf_get_colorspace (pixbuf) == GDK_COLORSPACE_RGB);
+    g_assert (gdk_pixbuf_get_bits_per_sample (pixbuf) == 8);
+    g_assert (gdk_pixbuf_get_has_alpha (pixbuf));
+    g_assert (n_channels == 4);
 
-  width = gdk_pixbuf_get_width (pixbuf);
-  height = gdk_pixbuf_get_height (pixbuf);
+    width = gdk_pixbuf_get_width (pixbuf);
+    height = gdk_pixbuf_get_height (pixbuf);
 
-  g_assert (x >= 0 && x < width);
-  g_assert (y >= 0 && y < height);
+    g_assert (x >= 0 && x < width);
+    g_assert (y >= 0 && y < height);
 
-  rowstride = gdk_pixbuf_get_rowstride (pixbuf);
-  pixels = gdk_pixbuf_get_pixels (pixbuf);
+    rowstride = gdk_pixbuf_get_rowstride (pixbuf);
+    pixels = gdk_pixbuf_get_pixels (pixbuf);
 
-  p = pixels + y * rowstride + x * n_channels;
-  p[0] = red;
-  p[1] = green;
-  p[2] = blue;
-  p[3] = alpha;
+    p = pixels + y * rowstride + x * n_channels;
+    p[0] = red;
+    p[1] = green;
+    p[2] = blue;
+    p[3] = alpha;
 }
+
 
 
 void file_choosed(GtkFileChooser* button, gpointer data)
 {
-    GtkImage *img;
-
     gchar *path;
-    path = gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(button));
-    SDL_Surface *surface = load_image((char) path);
-    GdkPixbuf *pixbuf = gtk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w,surface->h);
-    Uint32* pixels = surface->pixels;
+    GtkBox *pannel;
 
+    path = gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(button));
+
+    SDL_Surface* surface = IMG_Load("/home/paul/prog/projetS3/Software/image.png");
+    printf(":%s\n",SDL_GetError());
+    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w,surface->h);
+    Uint32* pixels = surface->pixels;
     Uint8 r,g,b;    
+
     for(size_t j = 0; j < surface->h; j++)
     {
         for(size_t i = 0; i < surface->w; i++)
@@ -59,9 +63,15 @@ void file_choosed(GtkFileChooser* button, gpointer data)
         }
     }
 
+    image = gtk_image_new_from_pixbuf(pixbuf);
+    
+    pannel = GTK_BOX(gtk_builder_get_object (builder, "pannel"));
+
+    gtk_box_pack_start(pannel,GTK_WIDGET(image),TRUE,TRUE,10);
 
     gtk_widget_show(window);
 }
+
 
 int main(int argc, char *argv[])
 {
