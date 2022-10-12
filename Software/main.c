@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <err.h>
+#include <string.h>
 
 #define UI_FILE "UI.glade"
 
@@ -39,6 +40,15 @@ void put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green,
     p[3] = alpha;
 }
 
+char* get_ext(const char *s)
+{
+    char* l = strrchr(s,'.');
+    if(!l || l == s)
+    { 
+        return "";
+    }
+    return l + 1;
+}
 
 
 void file_choosed(GtkFileChooser* button, gpointer data)
@@ -46,30 +56,41 @@ void file_choosed(GtkFileChooser* button, gpointer data)
     gchar *path;
     GtkBox *pannel;
 
-    path = gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(button));
-
-    SDL_Surface* surface = IMG_Load("/home/paul/prog/projetS3/Software/image.png");
-    printf(":%s\n",SDL_GetError());
-    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w,surface->h);
-    Uint32* pixels = surface->pixels;
-    Uint8 r,g,b;    
-
-    for(size_t j = 0; j < surface->h; j++)
-    {
-        for(size_t i = 0; i < surface->w; i++)
-        {
-            SDL_GetRGB(pixels[j*surface->w+i],surface->format,&r,&g,&b);
-            put_pixel(pixbuf,i,j,r,g,b,255);
-        }
-    }
-
-    image = gtk_image_new_from_pixbuf(pixbuf);
+    path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(button));
+    char* ext = get_ext(path);
     
-    pannel = GTK_BOX(gtk_builder_get_object (builder, "pannel"));
+    if(strcmp(ext, "png") == 0 || strcmp(ext, "jpg") == 0 || 
+        strcmp(ext, "jpeg") == 0 ||strcmp(ext, "bmp") == 0)
+    {
+        SDL_Surface* temp = IMG_Load(path);
+        SDL_Surface* surface = SDL_ConvertSurfaceFormat(temp,SDL_PIXELFORMAT_RGB888,0);
+        SDL_FreeSurface(temp);
+        GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w,surface->h);
+        Uint32* pixels = surface->pixels;
+        Uint8 r,g,b;    
 
-    gtk_box_pack_start(pannel,GTK_WIDGET(image),TRUE,TRUE,10);
+        for(size_t j = 0; j < surface->h; j++)
+        {
+            for(size_t i = 0; i < surface->w; i++)
+            {
+                SDL_GetRGB(pixels[j*surface->w+i],surface->format,&r,&g,&b);
+                put_pixel(pixbuf,i,j,r,g,b,255);
+            }
+        }
+        pixbuf = gdk_pixbuf_scale_simple(pixbuf,400,400,GDK_INTERP_BILINEAR);
 
-    gtk_widget_show(window);
+        image = gtk_builder_get_object (builder, "img");
+        gtk_image_set_from_pixbuf(GTK_IMAGE(image),pixbuf);
+        gtk_widget_set_visible(image,TRUE);
+    }
+    else
+    {
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "The selected file isn't a image");
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+    }
 }
 
 
