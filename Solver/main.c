@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <err.h>
+#include "solver.h"
 
 int main(int argc, char** argv)
 {
     FILE* f;
-    char[9][9] grid;
+    char grid[9][9];
     char c;
 
     if(argc != 2)
@@ -48,5 +50,28 @@ int main(int argc, char** argv)
         }
     }
 
-    //solve
+    fclose(f);
+
+    solve(grid);
+
+    f = fopen(strcat(argv[1],".result"),"w");
+    x = 0;
+    y = 0;
+    while(y < 9)
+    {
+        x = 0;
+        while(x< 9)
+        {
+            if(x == 2 || x == 5)
+            {
+                fprintf(f," ");
+            }
+            fprintf(f,"%i",grid[y][x]);
+            x++;
+        }
+        fprintf(f,"\n");
+        y++;
+    }
+    
+    fclose(f);
 }

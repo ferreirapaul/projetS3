@@ -1,7 +1,7 @@
-#include "solve.h"
+#include "solver.h"
 
 
-unsigned int lineCheck(char* list, size_t x, size_t y, size_t j)
+unsigned int lineCheck(char** grid, char* list, size_t x, size_t y, size_t j)
 {
     unsigned int res;
     int t = 0;
@@ -17,16 +17,16 @@ unsigned int lineCheck(char* list, size_t x, size_t y, size_t j)
 }
 
 
-unsigned int check(char* grid, size_t x, size_t y)
+unsigned int check(char** grid, size_t x, size_t y)
 {
     unsigned int res = 1;
-    char[9] list = {0};
+    char list[9]= {0};
 
     int i = x;  //X axis
     int j = 0;
     while(i < 9 && res)
     {
-        res = lineCheck(list,i,y,j);        
+        res = lineCheck(grid,list,i,y,j);        
         list[j] = grid[y][i];
         i++;
         j++;
@@ -35,7 +35,7 @@ unsigned int check(char* grid, size_t x, size_t y)
     i = x;
     while(i > -1 && res)
     {
-        res = lineCheck(list,i,y,j);        
+        res = lineCheck(grid,list,i,y,j);        
         list[j] = grid[y][i];
         i--;
         j++;
@@ -52,7 +52,7 @@ unsigned int check(char* grid, size_t x, size_t y)
     i = y; //Y axis
     while(i < 9 && res)
     {
-        res = lineCheck(list,x,i,j);        
+        res = lineCheck(grid,list,x,i,j);        
         list[j] = grid[i][x];
         i++;
         j++;
@@ -61,7 +61,7 @@ unsigned int check(char* grid, size_t x, size_t y)
     i = y;
     while(i > -1 && res)
     {
-        res = lineCheck(list,i,y,j);        
+        res = lineCheck(grid,list,i,y,j);        
         list[j] = grid[y][i];
         i--;
         j++;
@@ -74,13 +74,13 @@ unsigned int check(char* grid, size_t x, size_t y)
         i++;
     }
 
-    Tuple[] test = {{x+1,y+1},{x-1,y-1},{x,y+1},{x,y-1},{x+1,y},{x-1,y},
+    struct Tuple test[] = {{x+1,y+1},{x-1,y-1},{x,y+1},{x,y-1},{x+1,y},{x-1,y},
                     {x,y},{x-1,y+1},{x+1,y-1}};
 
     i = 0;
     while(i<9 && res)
     {
-        res = lineCheck(list,test[i].x,text[i].y,i);
+        res = lineCheck(grid,list,test[i].x,test[i].y,i);
         list[j] = grid[test[i].y][test[i].x];
         i++;
     }
@@ -89,7 +89,7 @@ unsigned int check(char* grid, size_t x, size_t y)
 }
 
 
-unsigned int __solve(char* grid, size_t x, size_t y)
+unsigned int __solve(char** grid, size_t x, size_t y)
 {   //recursive fonction that solve the board return false when no solutions are possible
     if(x == 9)
     {
@@ -127,7 +127,7 @@ unsigned int __solve(char* grid, size_t x, size_t y)
 }
 
 
-void solve(char* grid)
+void solve(char** grid)
 {
     unsigned int res = __solve(grid,0,0);
     if(!res)
