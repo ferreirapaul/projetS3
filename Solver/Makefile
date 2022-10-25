@@ -1,5 +1,5 @@
 solver: main.o solver.o
-	gcc -o solver main.o solver.o
+	gcc -o solver main.o solver.o -g
 
 main.o: main.c
 	gcc -c -o main.o main.c

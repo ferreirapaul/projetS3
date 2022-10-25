@@ -1,14 +1,20 @@
 #include "solver.h"
+#include <err.h>
 
-
-unsigned int lineCheck(char** grid, char* list, size_t x, size_t y, size_t j)
+unsigned int lineCheck(char grid[9][9], char* list, size_t x, size_t y, size_t j)
 {
-    unsigned int res;
+    unsigned int res = 1;
     int t = 0;
     while(t<j && res)
     {
-        if(grid[y][x] == list[t])
+        /*
+        printf("list : grid, x: %i, y: %i, %i\n",x,y,grid[y][x]);
+        printf("list : l: t: %i, %i\n",t,list[t]);*/
+        if(grid[y][x] == list[t] && grid[y][x] != 0)
         {
+            /*
+            printf("list : grid, x: %i, y: %i, %i\n",x,y,grid[x][y]);
+            printf("list : l: t: %i, %i\n",t,list[t]);*/
             res = 0;
         }
         t++;
@@ -17,8 +23,9 @@ unsigned int lineCheck(char** grid, char* list, size_t x, size_t y, size_t j)
 }
 
 
-unsigned int check(char** grid, size_t x, size_t y)
+unsigned int check(char grid[9][9], size_t x, size_t y)
 {
+    printf("c: x : %i, y : %i, %i\n",x,y,grid[x][y]);
     unsigned int res = 1;
     char list[9]= {0};
 
@@ -31,7 +38,7 @@ unsigned int check(char** grid, size_t x, size_t y)
         i++;
         j++;
     }
-
+    
     i = x;
     while(i > -1 && res)
     {
@@ -40,7 +47,7 @@ unsigned int check(char** grid, size_t x, size_t y)
         i--;
         j++;
     }
-
+    
     i = 0; //reset list
     while(i < 9)
     {
@@ -84,12 +91,12 @@ unsigned int check(char** grid, size_t x, size_t y)
         list[j] = grid[test[i].y][test[i].x];
         i++;
     }
-
+    
     return res;
 }
 
 
-unsigned int __solve(char** grid, size_t x, size_t y)
+unsigned int __solve(char grid[9][9], size_t x, size_t y)
 {   //recursive fonction that solve the board return false when no solutions are possible
     if(x == 9)
     {
@@ -105,14 +112,15 @@ unsigned int __solve(char** grid, size_t x, size_t y)
         return __solve(grid, x+1,y);
     }
 
-    unsigned int res = 1;
+    unsigned int res = 0;
     unsigned int n = 1;
 
     while(n < 10 && !res)
     {
         grid[y][x] = n;
-        if(check)
+        if(check(grid,x,y))
         {
+            printf("b");
             res = __solve(grid, x+1,y);
         }
 
@@ -127,7 +135,7 @@ unsigned int __solve(char** grid, size_t x, size_t y)
 }
 
 
-void solve(char** grid)
+void solve(char grid[9][9])
 {
     unsigned int res = __solve(grid,0,0);
     if(!res)

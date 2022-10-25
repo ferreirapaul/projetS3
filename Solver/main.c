@@ -51,7 +51,7 @@ int main(int argc, char** argv)
     }
 
     fclose(f);
-
+    
     solve(grid);
 
     f = fopen(strcat(argv[1],".result"),"w");
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
         x = 0;
         while(x< 9)
         {
-            if(x == 2 || x == 5)
+            if(x == 3 || x == 6)
             {
                 fprintf(f," ");
             }
