@@ -2,7 +2,7 @@ CC = gcc
 
 CPPFLAGS = `pkg-config --cflags sdl2 SDL2_image gtk+-3.0` -MMD -D__NO_INLINE__
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
-LDLFLAGS = -lm -lpthread 
+LDLFLAGS = -lm -lpthread
 LDLIBS = `pkg-config --libs sdl2 SDL2_image gtk+-3.0` -rdynamic
 
 BUILD := build

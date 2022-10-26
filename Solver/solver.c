@@ -7,14 +7,8 @@ unsigned int lineCheck(char grid[9][9], char* list, size_t x, size_t y, size_t j
     int t = 0;
     while(t<j && res)
     {
-        /*
-        printf("list : grid, x: %i, y: %i, %i\n",x,y,grid[y][x]);
-        printf("list : l: t: %i, %i\n",t,list[t]);*/
         if(grid[y][x] == list[t] && grid[y][x] != 0)
         {
-            /*
-            printf("list : grid, x: %i, y: %i, %i\n",x,y,grid[x][y]);
-            printf("list : l: t: %i, %i\n",t,list[t]);*/
             res = 0;
         }
         t++;
@@ -25,12 +19,12 @@ unsigned int lineCheck(char grid[9][9], char* list, size_t x, size_t y, size_t j
 
 unsigned int check(char grid[9][9], size_t x, size_t y)
 {
-    printf("c: x : %i, y : %i, %i\n",x,y,grid[x][y]);
     unsigned int res = 1;
-    char list[9]= {0};
+    char list[]= {0,0,0,0,0,0,0,0,0,0,0};
 
     int i = x;  //X axis
     int j = 0;
+    
     while(i < 9 && res)
     {
         res = lineCheck(grid,list,i,y,j);        
@@ -39,7 +33,7 @@ unsigned int check(char grid[9][9], size_t x, size_t y)
         j++;
     }
     
-    i = x;
+    i = x-1;
     while(i > -1 && res)
     {
         res = lineCheck(grid,list,i,y,j);        
@@ -48,13 +42,15 @@ unsigned int check(char grid[9][9], size_t x, size_t y)
         j++;
     }
     
+       
     i = 0; //reset list
-    while(i < 9)
+    while(i < 11)
     {
         list[i] = 0;
         i++;
     }
     j = 0;
+    
     
     i = y; //Y axis
     while(i < 9 && res)
@@ -65,30 +61,31 @@ unsigned int check(char grid[9][9], size_t x, size_t y)
         j++;
     }
     
-    i = y;
+    i = y-1;
     while(i > -1 && res)
     {
         res = lineCheck(grid,list,i,y,j);        
-        list[j] = grid[y][i];
+        list[j] = grid[i][x];
         i--;
         j++;
     }
-    
+
     i = 0; //reset list
-    while(i < 9)
+    while(i < 11)
     {
         list[i] = 0;
         i++;
     }
-
+    j = 0;
     struct Tuple test[] = {{x+1,y+1},{x-1,y-1},{x,y+1},{x,y-1},{x+1,y},{x-1,y},
                     {x,y},{x-1,y+1},{x+1,y-1}};
-
+    
     i = 0;
     while(i<9 && res)
     {
         res = lineCheck(grid,list,test[i].x,test[i].y,i);
         list[j] = grid[test[i].y][test[i].x];
+        j++;
         i++;
     }
     
@@ -102,9 +99,12 @@ unsigned int __solve(char grid[9][9], size_t x, size_t y)
     {
         if(y == 9)
         {
-            return 1;
+            return (unsigned int) 1;
         }
-        return __solve(grid,0,y+1);
+        else
+        {
+            return __solve(grid,0,y+1);
+        }
     }
 
     if(grid[y][x] != 0)
@@ -120,7 +120,6 @@ unsigned int __solve(char grid[9][9], size_t x, size_t y)
         grid[y][x] = n;
         if(check(grid,x,y))
         {
-            printf("b");
             res = __solve(grid, x+1,y);
         }
 
@@ -130,13 +129,12 @@ unsigned int __solve(char grid[9][9], size_t x, size_t y)
         }
         n++;
     } 
-
     return res;
 }
 
 
 void solve(char grid[9][9])
-{
+{ 
     unsigned int res = __solve(grid,0,0);
     if(!res)
     {

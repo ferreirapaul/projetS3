@@ -10,7 +10,7 @@
 GtkBuilder *builder;
 GtkWidget *window;
 GtkWidget *image = NULL;
-SDL_Surface *surface;
+SDL_Surface *surface = NULL;
 
 void put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, 
                 guchar blue, guchar alpha)
@@ -45,7 +45,7 @@ char* get_ext(const char *s)
     return l + 1;
 }
 
-void rotate(float degree);
+void rotate(double degree);
 
 
 void file_choosed(GtkFileChooser* button, gpointer data)
@@ -89,9 +89,10 @@ void file_choosed(GtkFileChooser* button, gpointer data)
         gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_widget_destroy(dialog);
     }
+    g_free(path);
 }
 
-void rotate(float degree)
+void rotate(double degree)
 {
     float sinAngle,cosAngle;
     int x,y,wHalf,hHalf,xt,yt;
@@ -102,6 +103,7 @@ void rotate(float degree)
     GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w*1.5,surface->h*1.5);
     wHalf = surface->w / 2;
     hHalf = surface->h / 2;
+    degree = degree * (G_PI/180.0);
     sinAngle = sin(degree);  
     cosAngle = cos(degree);
 
@@ -151,5 +153,12 @@ int main(int argc, char *argv[])
     gtk_widget_show (window);
 
     gtk_main ();
+
+    g_object_unref(builder);
+    g_object_unref(window);
+    if(surface != NULL)
+    {
+        SDL_FreeSurface(surface);
+    }
     return 0;
 }
