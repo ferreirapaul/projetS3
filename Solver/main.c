@@ -7,7 +7,18 @@
 int main(int argc, char** argv)
 {
     FILE* f;
-    char grid[9][9];
+    char grid[][9] = 
+    {
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0}
+    };
     char c;
 
     if(argc != 2)
@@ -62,7 +73,6 @@ int main(int argc, char** argv)
         x = 0;
         while(x< 9)
         {
-            printf("x:%i,y:%i\n",x,y);
             if(x == 3 || x == 6)
             {
                 fprintf(f," ");
@@ -71,6 +81,10 @@ int main(int argc, char** argv)
             x++;
         }
         fprintf(f,"\n");
+        if(y == 2 || y == 5)
+        {
+            fprintf(f,"\n");
+        }
         y++;
     }
     

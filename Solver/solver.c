@@ -41,7 +41,6 @@ unsigned int check(char grid[9][9], size_t x, size_t y)
         i--;
         j++;
     }
-    
        
     i = 0; //reset list
     while(i < 11)
@@ -60,11 +59,10 @@ unsigned int check(char grid[9][9], size_t x, size_t y)
         i++;
         j++;
     }
-    
     i = y-1;
     while(i > -1 && res)
     {
-        res = lineCheck(grid,list,i,y,j);        
+        res = lineCheck(grid,list,x,i,j);        
         list[j] = grid[i][x];
         i--;
         j++;
@@ -77,6 +75,35 @@ unsigned int check(char grid[9][9], size_t x, size_t y)
         i++;
     }
     j = 0;
+
+    switch(x/3)
+    {
+        case 0: 
+            x = 1;
+            break;
+        case 1:
+            x = 4;
+            break;
+        default:
+            x = 7;
+            break;
+    }
+    
+    switch(y/3)
+    {
+        case 0: 
+            y = 1;
+            break;
+        case 1:
+            y = 4;
+            break;
+        default:
+            y = 7;
+            break;
+    }
+
+
+
     struct Tuple test[] = {{x+1,y+1},{x-1,y-1},{x,y+1},{x,y-1},{x+1,y},{x-1,y},
                     {x,y},{x-1,y+1},{x+1,y-1}};
     
@@ -97,7 +124,7 @@ unsigned int __solve(char grid[9][9], size_t x, size_t y)
 {   //recursive fonction that solve the board return false when no solutions are possible
     if(x == 9)
     {
-        if(y == 9)
+        if(y == 8)
         {
             return (unsigned int) 1;
         }
