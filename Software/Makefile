@@ -33,4 +33,5 @@ format:
 
 clean:
 	rm -rf $(BUILD)
+	rm -f *.glade~
 	$(RM) $(EXEC)
