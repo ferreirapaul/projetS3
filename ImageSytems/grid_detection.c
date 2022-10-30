@@ -176,7 +176,7 @@ void houghTransformation(SDL_Surface* surface)
         }
     }
 
-    SDL_CreateRGBSurfaceWithFormat(0, maxTheta, doubleHeight, 32, format)
+    SDL_CreateRGBSurfaceWithFormat(0, maxTheta, doubleHeight, 32, format);
     
 }
 

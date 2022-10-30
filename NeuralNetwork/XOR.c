@@ -2,7 +2,7 @@
 
 void NeuralNet(int input[][2], int *output,struct Neuron *network, size_t lenIn)
 {
-    int target;
+    float target;
     for(size_t i = 0; i < 15000; i++)
     {
         for(size_t j = 0; j < lenIn; j++)
@@ -78,7 +78,7 @@ int main()
 
     int output[] = {0,1,1,0};
 
-    srand(22);
+    //srand(22);
 
     struct Neuron network[] = {
         {(float)rand()/(float)(RAND_MAX),0,(float)rand()/(float)(RAND_MAX),0,0},

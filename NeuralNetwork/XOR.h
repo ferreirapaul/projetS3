@@ -6,9 +6,9 @@
 
 struct Neuron
 {
-    float weight1;
-    float bias1;
-    float weight2;
-    float bias2;
-    float res;
+    double weight1;
+    double bias1;
+    double weight2;
+    double bias2;
+    double res;
 };
