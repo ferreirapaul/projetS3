@@ -62,7 +62,8 @@ void file_choosed(GtkFileChooser* button, gpointer data)
         SDL_Surface* temp = IMG_Load(path);
         surface = SDL_ConvertSurfaceFormat(temp,SDL_PIXELFORMAT_RGB888,0);
         SDL_FreeSurface(temp);
-        GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w*1.5,surface->h*1.5);
+        GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w
+                *1.5,surface->h*1.5);
         Uint32* pixels = surface->pixels;
         Uint8 r,g,b;    
 
@@ -85,7 +86,8 @@ void file_choosed(GtkFileChooser* button, gpointer data)
     {
         GtkWidget *dialog = gtk_message_dialog_new(
             GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
-            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "The selected file isn't a image");
+            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, 
+            "The selected file isn't a image");
         gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_widget_destroy(dialog);
     }
@@ -100,7 +102,8 @@ void rotate(double degree)
     Uint8 r,g,b;    
     Uint32* pixels = surface->pixels;
 
-    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w*1.5,surface->h*1.5);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w*1.5
+            ,surface->h*1.5);
     wHalf = surface->w / 2;
     hHalf = surface->h / 2;
     degree = degree * (G_PI/180.0);
@@ -148,7 +151,8 @@ int main(int argc, char *argv[])
     g_signal_connect(file, "file-set", G_CALLBACK(file_choosed), NULL); 
     
     buttonSpin = gtk_builder_get_object(builder,"spin");
-    g_signal_connect(buttonSpin, "value-changed", G_CALLBACK(init_rotate),NULL);
+    g_signal_connect(buttonSpin, "value-changed", G_CALLBACK(init_rotate),
+            NULL);
 
     gtk_widget_show (window);
 

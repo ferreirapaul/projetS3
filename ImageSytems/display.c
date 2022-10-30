@@ -70,7 +70,8 @@ int main(int argc, char** argv)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
     }
 
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 
+            SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
     

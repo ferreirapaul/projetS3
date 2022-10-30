@@ -30,10 +30,10 @@ void NeuralNet(int input[][2], int *output,struct Neuron *network, size_t lenIn)
                     * network[1].weight1 + input[j][1] * network[1].weight2) *
                 input[j][1];
 
-            network[2].bias1 = target * cos(network[0].res * network[2].weight1 +
-                    network[1].res * network[2].weight2) * network[0].res;
-            network[2].bias2 = target * cos(network[0].res * network[2].weight1 +
-                    network[1].res * network[2].weight2) * network[1].res;
+            network[2].bias1 = target * cos(network[0].res * network[2].weight1
+                    + network[1].res * network[2].weight2) * network[0].res;
+            network[2].bias2 = target * cos(network[0].res * network[2].weight1
+                    + network[1].res * network[2].weight2) * network[1].res;
 
             for(size_t t = 0; t < 3; t++)
             {
@@ -81,9 +81,12 @@ int main()
     //srand(22);
 
     struct Neuron network[] = {
-        {(float)rand()/(float)(RAND_MAX),0,(float)rand()/(float)(RAND_MAX),0,0},
-        {(float)rand()/(float)(RAND_MAX),0,(float)rand()/(float)(RAND_MAX),0,0},
-        {(float)rand()/(float)(RAND_MAX),0,(float)rand()/(float)(RAND_MAX),0,0},
+        {(float)rand()/(float)(RAND_MAX),0,(float)rand()/
+            (float)(RAND_MAX),0,0},
+        {(float)rand()/(float)(RAND_MAX),0,(float)rand()/
+            (float)(RAND_MAX),0,0},
+        {(float)rand()/(float)(RAND_MAX),0,(float)rand()/
+            (float)(RAND_MAX),0,0},
     };
 
     transformIn(input,output,4);

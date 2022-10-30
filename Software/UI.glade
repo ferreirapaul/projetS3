@@ -27,7 +27,8 @@
                 <property name="can-focus">False</property>
                 <property name="margin-top">20</property>
                 <property name="margin-bottom">15</property>
-                <property name="label" translatable="yes">  Load the Sudoku Image	:  </property>
+                <property name="label" 
+                    translatable="yes">  Load the Sudoku Image	:  </property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -82,7 +83,8 @@
                 <property name="can-focus">False</property>
                 <property name="margin-top">10</property>
                 <property name="margin-bottom">10</property>
-                <property name="label" translatable="yes">Rotate Manualy  (In degree)  </property>
+                <property name="label" translatable=
+                    "yes">  Rotate Manualy  (In degree)  </property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -127,7 +129,8 @@
                 <property name="can-focus">False</property>
                 <property name="margin-top">10</property>
                 <property name="margin-bottom">5</property>
-                <property name="label" translatable="yes">Network Bias :</property>
+                <property name="label" 
+                    translatable="yes"> Network Bias :</property>
               </object>
               <packing>
                 <property name="expand">False</property>

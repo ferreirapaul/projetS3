@@ -19,7 +19,8 @@ void draw(SDL_Renderer* renderer, SDL_Texture* texture)
 // renderer: Renderer to draw on.
 // colored: Texture that contains the colored image.
 // grayscale: Texture that contains the grayscale image.
-void event_loop(SDL_Renderer* renderer, SDL_Texture* colored, SDL_Texture* filtered)
+void event_loop(SDL_Renderer* renderer, SDL_Texture* colored, 
+        SDL_Texture* filtered)
 {
     SDL_Event event;
     SDL_Texture* t = colored;
@@ -166,7 +167,8 @@ void houghTransformation(SDL_Surface* surface)
                 int y = i / width;
                 int x = i - (y * width);
 
-                int rho = ((x - centerX) * (int)cos(rad)) + ((y - centerY) * (int)sin(rad));
+                int rho = ((x - centerX) * (int)cos(rad)) + ((y - centerY) * 
+                        (int)sin(rad));
             
                 rho += houghHeight;
 
@@ -209,7 +211,8 @@ int main(int argc, char** argv)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
     }
 
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 
+            SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
@@ -222,7 +225,8 @@ int main(int argc, char** argv)
     int h = surface->h;
     SDL_SetWindowSize(window,w,h);
     
-    SDL_Texture* textureColored = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Texture* textureColored = SDL_CreateTextureFromSurface(renderer, 
+            surface);
     if (textureColored == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
