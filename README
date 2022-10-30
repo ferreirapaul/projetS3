@@ -1,6 +1,6 @@
 Projet S3
 
-Each folders as is own Makefile, for the time being every part of the projet is not connected.
+Each folder has is own Makefile, for the time being, every part of the project is not connected.
 
 For instance, if you want to test the sofware you have to go to the Software directory and write:
 
