@@ -1,69 +1,19 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <err.h>
 #include "solver.h"
 
 int main(int argc, char** argv)
 {
-    FILE* f;
-    char grid[][9] = 
-    {
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0}
-    };
-    char c;
-
     if(argc != 2)
     {
         errx(EXIT_FAILURE, "Usage : ./solver name");
     }
 
-    f = fopen(argv[1], "r");
-    if(f == NULL)
-    {
-        errx(EXIT_FAILURE, "error in the opening of the file");
-    }
-    
-    int x = 0;
-    int y = 0;
-    while(!feof(f))
-    {
-        if(x == 9)
-        {
-            if(y == 9)
-            {
-                errx(EXIT_FAILURE, "the file format is not respected");
-            }
-            x = 0;
-            y++;
-        }
-        
-        c = fgetc(f);
-        if(c!= ' ' && c!= '\n')
-        {
-            if(c=='.')
-            {
-                grid[y][x] = 0;
-            }
-            else
-            {
-                grid[y][x] = c - '0'; 
-            }
-            x++;
-        }
-    }
-
-    fclose(f);
+    char **grid = get_grid(argv[1]);
     
     solve(grid);
+
+    FILE *f;
+    int x;
+    int y;
     
     f = fopen(strcat(argv[1],".result"),"w");
     x = 0;

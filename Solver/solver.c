@@ -160,6 +160,63 @@ unsigned int __solve(char grid[9][9], size_t x, size_t y)
 }
 
 
+char **get_grid(char* path)
+{
+    FILE* f;
+    char grid[][9] = 
+    {
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0}
+    };
+    char c;
+
+    f = fopen(path, "r");
+    if(f == NULL)
+    {
+        errx(EXIT_FAILURE, "error in the opening of the file");
+    }
+    
+    int x = 0;
+    int y = 0;
+    while(!feof(f))
+    {
+        if(x == 9)
+        {
+            if(y == 9)
+            {
+                errx(EXIT_FAILURE, "the file format is not respected");
+            }
+            x = 0;
+            y++;
+        }
+        
+        c = fgetc(f);
+        if(c!= ' ' && c!= '\n')
+        {
+            if(c=='.')
+            {
+                grid[y][x] = 0;
+            }
+            else
+            {
+                grid[y][x] = c - '0'; 
+            }
+            x++;
+        }
+    }
+
+    fclose(f);
+    return grid;
+}
+
+
 void solve(char grid[9][9])
 { 
     unsigned int res = __solve(grid,0,0);
