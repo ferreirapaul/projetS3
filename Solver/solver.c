@@ -1,7 +1,20 @@
 #include "solver.h"
 #include <err.h>
+#include <stdio.h>
 
-unsigned int lineCheck(char grid[9][9], char* list, size_t x, size_t y, size_t j)
+void printBoard(char **grid)
+{
+    for(size_t y = 0; y < 9; y++)
+    {
+        for(size_t x = 0; x < 9; x++)
+        {
+            printf("%i", grid[y][x]);
+        }
+        printf("\n");
+    }
+}
+
+unsigned int lineCheck(char **grid, char* list, size_t x, size_t y, size_t j)
 {
     unsigned int res = 1;
     int t = 0;
@@ -17,7 +30,7 @@ unsigned int lineCheck(char grid[9][9], char* list, size_t x, size_t y, size_t j
 }
 
 
-unsigned int check(char grid[9][9], size_t x, size_t y)
+unsigned int check(char **grid, size_t x, size_t y)
 {
     unsigned int res = 1;
     char list[]= {0,0,0,0,0,0,0,0,0,0,0};
@@ -120,7 +133,7 @@ unsigned int check(char grid[9][9], size_t x, size_t y)
 }
 
 
-unsigned int __solve(char grid[9][9], size_t x, size_t y)
+unsigned int __solve(char **grid, size_t x, size_t y)
 {   //recursive fonction that solve the board return false when no solutions are possible
     if(x == 9)
     {
@@ -160,31 +173,22 @@ unsigned int __solve(char grid[9][9], size_t x, size_t y)
 }
 
 
-char **get_grid(char* path)
+char** get_grid(char* path)
 {
     FILE* f;
-    char grid[][9] = 
-    {
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0}
-    };
+    char **grid = malloc(81);
     char c;
 
     f = fopen(path, "r");
     if(f == NULL)
     {
+        free(grid);
         errx(EXIT_FAILURE, "error in the opening of the file");
     }
     
     int x = 0;
     int y = 0;
+    grid[0] = malloc(9);
     while(!feof(f))
     {
         if(x == 9)
@@ -195,6 +199,7 @@ char **get_grid(char* path)
             }
             x = 0;
             y++;
+            grid[y] = malloc(9);
         }
         
         c = fgetc(f);
@@ -212,12 +217,11 @@ char **get_grid(char* path)
         }
     }
 
-    fclose(f);
     return grid;
 }
 
 
-void solve(char grid[9][9])
+void solve(char **grid)
 { 
     unsigned int res = __solve(grid,0,0);
     if(!res)

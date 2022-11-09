@@ -1,4 +1,5 @@
 #include "build_result.h"
+#include <stdlib.h>
 
 SDL_Surface *load_surface(char *path)
 {
@@ -9,9 +10,10 @@ SDL_Surface *load_surface(char *path)
     return res;
 }
 
+
 SDL_Surface **load_numbers()
 {
-    SDL_Surface *numbers[9];
+    SDL_Surface **numbers= malloc(9*8);
     char paths[][40] = {
         "../Image/training/training_1.png",
         "../Image/training/training_2.png",
@@ -32,22 +34,27 @@ SDL_Surface **load_numbers()
     return numbers;
 }
 
-void put_surface(SDL_Surface **numbers, SDL_Surface *surface, size_t x, size_t y, char n)
+
+void put_surface(SDL_Surface **numbers, SDL_Surface *surface, int  *x, int *y, char n)
 {
     SDL_Surface *number = numbers[n-1];
 
     Uint32* pixelsS = surface->pixels;
     Uint32* pixelsD = number->pixels;
+    int i = *x;
+    int j = *y;
     size_t t = 0;
-    for(size_t j = y; j < number->h + y; j++)
+    for(; *y < number->h + j; (*y)++)
     {
-        for(size_t i = x; i < number->w + x; i++)
+        for(; *x < number->w + i; (*x)++)
         {
-            pixelsS[j*(number->w +x) + i] = pixelsD[t];
+            pixelsS[*y*(number->w +i) + *x] = pixelsD[t];
             t++;
         }
     }
+    *y = j;
 }
+
 
 void free_numbers(SDL_Surface **numbers)
 {
@@ -55,11 +62,13 @@ void free_numbers(SDL_Surface **numbers)
     {
         SDL_FreeSurface(numbers[x]);
     }
+    free(numbers);
 }
 
-SDL_Surface *build_result(char grid[][9])
+
+SDL_Surface *build_result(char **grid)
 {
-    SDL_Surface *res = load_surface("../Image/exemple/grid.png");
+    SDL_Surface *res = load_surface("grid.png");
     SDL_Surface **numbers = load_numbers();
     int i,j;
     i=12;
@@ -77,11 +86,11 @@ SDL_Surface *build_result(char grid[][9])
             {
                 i += 5;
             } 
+            put_surface(numbers,res,&i,&j,grid[y][x]);
             i +=6; 
             j +=6; 
-            put_surface(numbers,res,i,j,grid[y][x]);
         }
-        j += 6;
+        j += 6+numbers[0]->h;
     }
 
     free_numbers(numbers);

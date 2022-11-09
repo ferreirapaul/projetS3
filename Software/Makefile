@@ -8,7 +8,7 @@ LDLIBS = `pkg-config --libs sdl2 SDL2_image gtk+-3.0` -rdynamic
 BUILD := build
 EXEC := main
 
-SRC =  $(shell find -name "*.c")
+SRC = soft.c main.c build_result.c ../Solver/solver.c 
 OBJ = $(SRC:%.c=$(BUILD)/%.o)
 DEP = $(SRC:%.c=$(BUILD)/%.d)
 
@@ -32,6 +32,7 @@ format:
 	find -name "*.[ch]" -exec clang-format --verbose -i {} \;
 
 clean:
+	rm -rf Solver
 	rm -rf $(BUILD)
 	rm -f *.glade~
 	$(RM) $(EXEC)

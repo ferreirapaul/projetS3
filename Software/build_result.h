@@ -10,6 +10,6 @@
 
 SDL_Surface *load_surface(char *path);
 SDL_Surface **load_numbers();
-void put_surface(SDL_Surface **numbers, SDL_Surface *surface, size_t x, size_t y, char n);
+void put_surface(SDL_Surface **numbers, SDL_Surface *surface, int* x, int* y, char n);
 void free_numbers(SDL_Surface **numbers);
-SDL_Surface *build_result(char grid[][9]);
+SDL_Surface *build_result(char **grid);

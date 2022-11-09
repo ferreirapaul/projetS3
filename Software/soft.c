@@ -40,7 +40,7 @@ char* get_ext(const char *s)
     return l + 1;
 }
 
-void load_img(SDL_Surface surface)
+void load_img(SDL_Surface *surface)
 {
     GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w
                 *1.5,surface->h*1.5);
@@ -131,12 +131,23 @@ void init_rotate(GtkSpinButton *self, gpointer user_data)
     rotate(gtk_spin_button_get_value(self));
 }
 
+void free_grid(char **grid)
+{
+    for(size_t i = 0; i < 9; i++)
+    {
+        free(grid[i]);
+    }
+    free(grid);
+}
+
 void start_process(GtkSpinButton *self, gpointer user_data)
 {
     char **grid = get_grid("../Solver/grid_00");
     solve(grid);
     SDL_Surface *surf = build_result(grid);
     load_img(surf);
+    SDL_FreeSurface(surf);
+    free_grid(grid);
 }
 
 void init_soft(int argc, char *argv[])
