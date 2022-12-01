@@ -6,6 +6,7 @@ GtkBuilder *builder;
 GtkWidget *window;
 GtkWidget *image = NULL;
 SDL_Surface *surface = NULL;
+SDL_Surface *res = NULL;
 
 void put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, 
                 guchar blue, guchar alpha)
@@ -140,14 +141,22 @@ void free_grid(char **grid)
     free(grid);
 }
 
-void start_process(GtkSpinButton *self, gpointer user_data)
+void start_process(GtkButton *self, gpointer user_data)
 {
-    char **grid = get_grid("../Solver/grid_00");
-    solve(grid);
-    SDL_Surface *surf = build_result(grid);
-    load_img(surf);
-    SDL_FreeSurface(surf);
-    free_grid(grid);
+    if(gtk_button_get_label(self) != "Save")
+    {
+        char **grid = get_grid("../Solver/grid_00");
+        solve(grid);
+        SDL_Surface *res = build_result(grid);
+        load_img(res);
+        free_grid(grid);
+        gtk_button_set_label(self, "Save");
+    }
+    else
+    {
+        printf("a");
+        IMG_SavePNG(res, "grid_res.png");
+    }
 }
 
 void init_soft(int argc, char *argv[])
@@ -185,5 +194,9 @@ void init_soft(int argc, char *argv[])
     if(surface != NULL)
     {
         SDL_FreeSurface(surface);
+    }
+    if(res != NULL)
+    {
+        SDL_FreeSurface(res);
     }
 }
