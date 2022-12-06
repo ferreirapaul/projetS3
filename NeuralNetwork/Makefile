@@ -1,14 +1,14 @@
 CC = gcc
 
-CPPFLAGS = `pkg-config --cflags sdl2 SDL2_image` -MMD -D__NO_INLINE__
+CPPFLAGS = `pkg-config --cflags sdl2 SDL2_image gtk+-3.0` -MMD -D__NO_INLINE__
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
 LDLFLAGS = -lm -lpthread
-LDLIBS = `pkg-config --libs sdl2 SDL2_image` -rdynamic
+LDLIBS = `pkg-config --libs sdl2 SDL2_image gtk+-3.0` -rdynamic
 
-BUILD := build Software
+BUILD := build
 EXEC := main
 
-SRC = network.c ../Software/build_result.c
+SRC = network.c ../Software/build_result.c ../Software/soft.c ../Solver/solver.c
 OBJ = $(SRC:%.c=$(BUILD)/%.o)
 DEP = $(SRC:%.c=$(BUILD)/%.d)
 

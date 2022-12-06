@@ -11,6 +11,7 @@
 
 void put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, 
                 guchar blue, guchar alpha);
+GdkPixbuf *load_pix(SDL_Surface *surface);
 char* get_ext(const char *s);
 void rotate(double degree);
 void file_choosed(GtkFileChooser* button, gpointer data);

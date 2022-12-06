@@ -1,6 +1,7 @@
 #pragma once
 #include <stdlib.h>
 #include <stdio.h>
+#define SIZE 784
 
 struct Neuron
 {
@@ -8,4 +9,6 @@ struct Neuron
     double *bias;
     double res;
 };
+
+
 

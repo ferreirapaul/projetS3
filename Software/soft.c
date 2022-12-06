@@ -41,8 +41,8 @@ char* get_ext(const char *s)
     return l + 1;
 }
 
-void load_img(SDL_Surface *surface)
-{
+GdkPixbuf *load_pix(SDL_Surface *surface)
+{   
     GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,surface->w
                 *1.5,surface->h*1.5);
     Uint32* pixels = surface->pixels;
@@ -56,12 +56,18 @@ void load_img(SDL_Surface *surface)
             put_pixel(pixbuf,i+surface->w/4,j+surface->h/4,r,g,b,255);
         }
     }
+    return pixbuf;
+}
 
+void load_img(SDL_Surface *surface)
+{
+    GdkPixbuf *pixbuf = load_pix(surface);
     pixbuf = gdk_pixbuf_scale_simple(pixbuf,400,400,GDK_INTERP_BILINEAR);
 
     image = gtk_builder_get_object (builder, "img");
     gtk_image_set_from_pixbuf(GTK_IMAGE(image),pixbuf);
     gtk_widget_set_visible(image,TRUE);
+    g_object_unref(pixbuf);
 }
 
 void file_choosed(GtkFileChooser* button, gpointer data)
