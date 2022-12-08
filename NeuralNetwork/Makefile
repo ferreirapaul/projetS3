@@ -8,7 +8,7 @@ LDLIBS = `pkg-config --libs sdl2 SDL2_image gtk+-3.0` -rdynamic
 BUILD := build
 EXEC := main
 
-SRC = network.c ../Software/build_result.c ../Software/soft.c ../Solver/solver.c
+SRC = network.c ../Software/build_result.c
 OBJ = $(SRC:%.c=$(BUILD)/%.o)
 DEP = $(SRC:%.c=$(BUILD)/%.d)
 
@@ -34,6 +34,6 @@ format:
 clean:
 	rm -rf Solver
 	rm -r *.o
-	rm -rf $(BUILD)
+	rm -rf 
 	rm -f *.glade~
 	$(RM) $(EXEC)

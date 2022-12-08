@@ -6,7 +6,7 @@
 struct Neuron
 {
     double *weights;
-    double *bias;
+    double delta;
     double res;
 };
 
