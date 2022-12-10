@@ -16,15 +16,15 @@ SDL_Surface **load_numbers()
 {
     SDL_Surface **numbers= malloc(9*sizeof(void *));
     char paths[][40] = {
-        "../Image/training/training_1.png",
-        "../Image/training/training_2.png",
-        "../Image/training/training_3.png",
-        "../Image/training/training_4.png",
-        "../Image/training/training_5.png",
-        "../Image/training/training_6.png",
-        "../Image/training/training_7.png",
-        "../Image/training/training_8.png",
-        "../Image/training/training_9.png",
+        "../Image/result/result_1.png",
+        "../Image/result/result_2.png",
+        "../Image/result/result_3.png",
+        "../Image/result/result_4.png",
+        "../Image/result/result_5.png",
+        "../Image/result/result_6.png",
+        "../Image/result/result_7.png",
+        "../Image/result/result_8.png",
+        "../Image/result/result_9.png",
     };
 
     for(size_t i = 0; i < 9; i++)
@@ -79,7 +79,7 @@ SDL_Surface *build_result(char **grid)
         {
             j += 7;
         }
-        i = 12;
+        i = 13;
         for(size_t x = 0; x < 9; x++)
         {
             if(x == 4 ||x == 7)

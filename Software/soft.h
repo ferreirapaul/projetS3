@@ -14,7 +14,7 @@ void put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green,
 GdkPixbuf *load_pix(SDL_Surface *surface);
 char* get_ext(const char *s);
 void rotate(double degree);
-void file_choosed(GtkFileChooser* button, gpointer data);
+void file_choosed(GtkFileChooser* button);
 void rotate(double degree);
-void init_rotate(GtkSpinButton *self, gpointer user_data);
+void init_rotate(GtkSpinButton *self);
 void init_soft(int argc, char *argv[]);

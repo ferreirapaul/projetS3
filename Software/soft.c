@@ -4,7 +4,7 @@
 
 GtkBuilder *builder;
 GtkWidget *window;
-GtkWidget *image = NULL;
+GtkImage *image = NULL;
 SDL_Surface *surface = NULL;
 SDL_Surface *res = NULL;
 
@@ -48,9 +48,9 @@ GdkPixbuf *load_pix(SDL_Surface *surface)
     Uint32* pixels = surface->pixels;
     Uint8 r,g,b;    
 
-    for(size_t j = 0; j < surface->h; j++)
+    for(size_t j = 0; j < (size_t) surface->h; j++)
     {
-        for(size_t i = 0; i < surface->w; i++)
+        for(size_t i = 0; i < (size_t) surface->w; i++)
         {
             SDL_GetRGB(pixels[j*surface->w+i],surface->format,&r,&g,&b);
             put_pixel(pixbuf,i+surface->w/4,j+surface->h/4,r,g,b,255);
@@ -64,16 +64,15 @@ void load_img(SDL_Surface *surface)
     GdkPixbuf *pixbuf = load_pix(surface);
     pixbuf = gdk_pixbuf_scale_simple(pixbuf,400,400,GDK_INTERP_BILINEAR);
 
-    image = gtk_builder_get_object (builder, "img");
-    gtk_image_set_from_pixbuf(GTK_IMAGE(image),pixbuf);
-    gtk_widget_set_visible(image,TRUE);
+    image = GTK_IMAGE(gtk_builder_get_object (builder, "img"));
+    gtk_image_set_from_pixbuf(image,pixbuf);
+    gtk_widget_set_visible(GTK_WIDGET(image),TRUE);
     g_object_unref(pixbuf);
 }
 
-void file_choosed(GtkFileChooser* button, gpointer data)
+void file_choosed(GtkFileChooser *button)
 {
     gchar *path;
-    GtkBox *pannel;
 
     path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(button));
     char* ext = get_ext(path);
@@ -84,7 +83,7 @@ void file_choosed(GtkFileChooser* button, gpointer data)
         SDL_Surface* temp = IMG_Load(path);
         surface = SDL_ConvertSurfaceFormat(temp,SDL_PIXELFORMAT_RGB888,0);
         SDL_FreeSurface(temp);
-        image = gtk_builder_get_object (builder, "img");
+        image = GTK_IMAGE(gtk_builder_get_object (builder, "img"));
 
         load_img(surface);
     }
@@ -104,7 +103,7 @@ void rotate(double degree)
 {
     float sinAngle,cosAngle;
     int x,y,wHalf,hHalf,xt,yt;
-    int w = sqrt(surface->h*surface->h + surface->w*surface->w);
+    //int w = sqrt(surface->h*surface->h + surface->w*surface->w);
     Uint8 r,g,b;    
     Uint32* pixels = surface->pixels;
 
@@ -116,9 +115,9 @@ void rotate(double degree)
     sinAngle = sin(degree);  
     cosAngle = cos(degree);
 
-    for(size_t j = 0; j < surface->h; j++)
+    for(size_t j = 0; j < (size_t) surface->h; j++)
     {
-        for(size_t i = 0; i < surface->w; i++)
+        for(size_t i = 0; i < (size_t) surface->w; i++)
         {
             SDL_GetRGB(pixels[j*surface->w+i],surface->format,&r,&g,&b);
             xt = i - wHalf;
@@ -133,7 +132,7 @@ void rotate(double degree)
     gtk_image_set_from_pixbuf(GTK_IMAGE(image),pixbuf);
 }
 
-void init_rotate(GtkSpinButton *self, gpointer user_data)
+void init_rotate(GtkSpinButton *self)
 {
     rotate(gtk_spin_button_get_value(self));
 }
@@ -147,20 +146,19 @@ void free_grid(char **grid)
     free(grid);
 }
 
-void start_process(GtkButton *self, gpointer user_data)
+void start_process(GtkButton *self)
 {
-    if(gtk_button_get_label(self) != "Save")
+    if(strcmp(gtk_button_get_label(self),"Save"))
     {
         char **grid = get_grid("../Solver/grid_00");
         solve(grid);
-        SDL_Surface *res = build_result(grid);
+        res = build_result(grid);
         load_img(res);
         free_grid(grid);
         gtk_button_set_label(self, "Save");
     }
     else
     {
-        printf("a");
         IMG_SavePNG(res, "grid_res.png");
     }
 }
@@ -168,8 +166,8 @@ void start_process(GtkButton *self, gpointer user_data)
 void init_soft(int argc, char *argv[])
 {
     GtkFileChooserButton *file;
-    GtkWidget *buttonSpin;
-    GtkWidget *buttonStart;
+    GtkSpinButton *buttonSpin;
+    GtkButton *buttonStart;
 
     SDL_Init(SDL_INIT_VIDEO);
     gtk_init (&argc, &argv);
@@ -183,11 +181,11 @@ void init_soft(int argc, char *argv[])
     file = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object (builder, "file"));
     g_signal_connect(file, "file-set", G_CALLBACK(file_choosed), NULL); 
     
-    buttonSpin = gtk_builder_get_object(builder,"spin");
+    buttonSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(builder,"spin"));
     g_signal_connect(buttonSpin, "value-changed", G_CALLBACK(init_rotate),
             NULL);
 
-    buttonStart = gtk_builder_get_object(builder,"start");
+    buttonStart = GTK_BUTTON(gtk_builder_get_object(builder,"start"));
     g_signal_connect(buttonStart, "clicked", G_CALLBACK(start_process),
             NULL);
 
@@ -196,7 +194,7 @@ void init_soft(int argc, char *argv[])
     gtk_main ();
 
     g_object_unref(builder);
-    g_object_unref(window);
+
     if(surface != NULL)
     {
         SDL_FreeSurface(surface);
