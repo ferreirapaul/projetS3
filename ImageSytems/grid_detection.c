@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
+
 // Updates the display.
 //
 // renderer: Renderer to draw on.
@@ -127,7 +128,7 @@ int max(int a, int b)
     }
     return max;
 }
-
+/*
 void houghTransformation(SDL_Surface* surface)
 {
     Uint32* pixels = surface->pixels;
@@ -181,7 +182,7 @@ void houghTransformation(SDL_Surface* surface)
     SDL_CreateRGBSurfaceWithFormat(0, maxTheta, doubleHeight, 32, format);
     
 }
-
+*/
 int main(int argc, char** argv)
 {
     // Checks the number of arguments.
@@ -236,9 +237,15 @@ int main(int argc, char** argv)
     if (textureGray == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
+    hough(surface);
+
     SDL_FreeSurface(surface);
 
-    event_loop(renderer,textureColored, textureGray);
+
+
+    //event_loop(renderer,textureColored, textureGray);
+
+
 
     SDL_DestroyTexture(textureColored);
     SDL_DestroyTexture(textureGray);
@@ -248,4 +255,85 @@ int main(int argc, char** argv)
 
 
     return EXIT_SUCCESS;
+}
+
+void houghTransform(SDL_Surface *surface){
+    Uint32* pixels = surface->pixels;
+    int width = surface->w;
+    int height = surface->h;
+    int len = width * height;
+    SDL_PixelFormat* format = surface->format;
+    Uint32* acc = calloc(len, len*sizeof(Uint32));
+
+
+    for(size_t x = 0; x < width; x++){
+        for(size_t y = 0; y < height; y++){
+            for(int teta = 0; teta < 180; teta += 5){
+                int rho = x*cos(teta) + y*sin(teta);
+                acc[rho+width*teta] ++;
+            }
+        }
+    }
+}
+
+
+void hough(SDL_Surface *surface)
+{
+    
+    Uint32* pixels = surface->pixels;
+    unsigned int width = surface->w;
+    unsigned int height = surface->h;
+    
+    unsigned int rho, theta;
+    rho = sqrt(width * width + height * height);
+    theta = 90;
+
+    //initialise accumulator array
+    unsigned int acc[rho][theta];
+    
+    for (size_t i = 0; i < rho; i++)
+    {
+        for (size_t j = 0; j < theta; j++)
+            acc[i][j] = 0;
+    }
+    printf("%u\n", height);
+
+
+    Uint32 pixel;
+    Uint8 r, g, b;
+
+    //go through each pixels
+    for (size_t x = 0; x < width; x++)
+    {
+        for (size_t y = 0; y < height; y++)
+        {
+            //printf("testing pixel #%zu\n", x+y*width);
+            pixel = pixels[x+y*width];
+            SDL_GetRGB(pixel, surface->format, &r, &g, &b);
+
+            
+
+            //if white
+            if (r+g+b >= 400)
+            {
+                
+                //p = x*cos(t) + y*sin(t)
+                //check for every t
+                for (int t = 0; t < 90;t++)
+                {
+
+                    unsigned int p = x*cos(t*M_PI/180) + y*sin(t*M_PI/180);
+                    //printf("testing pixel #%zu to acc value %zu,%i\n",x+y*width, p, t);
+                    acc[p][t]++;
+                }
+            }
+        }
+    }
+    
+    for(int x = 0; x < rho; x++ ){
+        for(int y = 0; y < theta; y++){
+            printf("| %u ", acc[x][y]);
+        }
+        printf("|\n");
+    }
 }
