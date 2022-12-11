@@ -21,7 +21,7 @@ void draw(SDL_Renderer* renderer, SDL_Texture* texture)
 // colored: Texture that contains the colored image.
 // grayscale: Texture that contains the grayscale image.
 void event_loop(SDL_Renderer* renderer, SDL_Texture* colored, 
-        SDL_Texture* filtered)
+        SDL_Texture* filtered, SDL_Texture* hough)
 {
     SDL_Event event;
     SDL_Texture* t = colored;
@@ -41,6 +41,7 @@ void event_loop(SDL_Renderer* renderer, SDL_Texture* colored,
                 if (event.window.event == SDL_WINDOWEVENT_RESIZED)
                 {
                     t = filtered;
+                    t = hough;
                     draw(renderer, t);
                 }
                 break;
@@ -128,61 +129,166 @@ int max(int a, int b)
     }
     return max;
 }
-/*
-void houghTransformation(SDL_Surface* surface)
+ 
+void hough(SDL_Surface *surface)
 {
-    Uint32* pixels = surface->pixels;
-    SDL_PixelFormat* format = surface->format;
-    int width = surface->w;
-    int height = surface->h;
-    int len = surface->w * surface->h;
-
-    double pi = 3.1415926535;
-
-    int centerX = width / 2;
-    int centerY = height / 2;
     
-    int maxTheta = 180;
-    int houghHeight = sqrt(2) * max(width, height) / 2;
-    int doubleHeight = houghHeight * 2;
-    int houghHeightHalf = houghHeight / 2;
-    int houghWidthHalf = maxTheta / 2;
+    Uint32* pixels = surface->pixels;
+    unsigned int width = surface->w;
+    unsigned int height = surface->h;
+    
+    unsigned int rho, theta;
+    rho = sqrt(width * width + height * height);
+    unsigned int p;
+    theta = 90;
 
-
-    int* M[doubleHeight * maxTheta];
-
-    for(int i = 0; i < len; i++)
+    //initialise accumulator array
+    unsigned int acc[rho][theta];
+    
+    for (size_t i = 0; i < rho; i++)
     {
-        SDL_Color rgb;
-        SDL_GetRGB(pixels[i], format, &rgb.r, &rgb.g, &rgb.b);
-        if (rgb.r == 0 && rgb.g == 0 && rgb.b == 00)
-        {
-            continue;   
-        }
-        else
-        {
-            for (int theta = 0; theta < maxTheta; theta ++)
-            {
-                double rad = theta * pi / 180;
+        for (size_t j = 0; j < theta; j++)
+            acc[i][j] = 0;
+    }
+    printf("%u\n", height);
 
-                int y = i / width;
-                int x = i - (y * width);
 
-                int rho = ((x - centerX) * (int)cos(rad)) + ((y - centerY) * 
-                        (int)sin(rad));
+    Uint32 pixel;
+    Uint8 r, g, b;
+
+    //go through each pixels
+    for (size_t x = 0; x < width; x++)
+    {
+        for (size_t y = 0; y < height; y++)
+        {
+            //printf("testing pixel #%zu\n", x+y*width);
+            pixel = pixels[x+y*width];
+            SDL_GetRGB(pixel, surface->format, &r, &g, &b);
+
             
-                rho += houghHeight;
 
-                if (rho > 0 && rho <= doubleHeight)
-                    M[rho * maxTheta + theta] += 1;
+            //if white
+            if (r+g+b >= 400)
+            {
+                
+                unsigned int t = 0;
+                p = x*cos(t*M_PI/180) + y*sin(t*M_PI/180);
+                //printf("testing pixel #%zu to acc value %zu,%i\n",x+y*width, p, t);
+                acc[p][t]++;
+                t = 90;
+                p = x*cos(t*M_PI/180) + y*sin(t*M_PI/180);
+                //printf("testing pixel #%zu to acc value %zu,%i\n",x+y*width, p, t);
+                acc[p][t]++;
+            }
+        }
+    }
+    
+    unsigned int intersect[width*height];
+    unsigned int vertical[rho/9];
+    unsigned int horizontal[rho/9];
+
+    for(p = 0; p < rho; p += 9){
+        unsigned int moyenne = 0;
+        unsigned int ecart = 0;
+        
+        for(size_t i = p; i< p+9; i++){
+            moyenne += acc[i][0];
+        }
+        moyenne /= 9;
+
+        for(size_t i=0; i<9; i++){
+            ecart += (acc[p+i][0]+moyenne)*(acc[p+i][0]+moyenne);
+        }
+        ecart /= 9;
+        ecart = sqrt(ecart);
+        if(moyenne > 90 && ecart < 50){
+            horizontal[p/9] = 1;
+        }
+
+        moyenne = 0;
+        ecart = 0;
+        
+        for(size_t i = p; i< p+9; i++){
+            moyenne += acc[i][90];
+        }
+        moyenne /= 9;
+
+        for(size_t i=0; i<9; i++){
+            ecart += (acc[p+i][0]+moyenne)*(acc[p+i][0]+moyenne);
+        }
+        ecart /= 9;
+        ecart = sqrt(ecart);
+        if(moyenne > 90 && ecart < 50){
+            vertical[p/9] = 1;
+        }
+    }
+
+    for(size_t i = 0; i < rho/9; i++){
+        if(vertical[i] == 1){
+            for(size_t j = 0; j < rho/9; j++){
+                if (horizontal[j] == 1){
+                    intersect[i*9+j*9*width] = 255;
+                }
             }
         }
     }
 
-    SDL_CreateRGBSurfaceWithFormat(0, maxTheta, doubleHeight, 32, format);
-    
-}
-*/
+    SDL_PixelFormat* format = surface->format;
+    SDL_LockSurface(surface);
+    Uint32 nr;
+    Uint32 ng;
+    Uint32 nb;
+    for(int x = 0; x < width; x++ )
+    {
+        for(int y = 0; y < height; y++)
+        {
+            //SDL_Color rgb;
+            //SDL_GetRGB(pixels[x + y * width], format, &rgb.r, &rgb.g, &rgb.b);
+
+            nr = intersect[x + y * width];
+            ng = intersect[x + y * width];
+            nb = intersect[x + y * width];
+
+            if (nr == 255)
+            {
+                /*pixels[(x-2) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x-2) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x-2) + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x-2) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x-2) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x-1) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x-1) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x-1) + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x-1) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x-1) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[x + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[x + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[x + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[x + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[x + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x+1) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x+1) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x+1) + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x+1) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x+1) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x+2) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x+2) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x+2) + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x+2) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                pixels[(x+2) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);*/
+                
+            }
+            else
+            {
+                pixels[x + y * width] = SDL_MapRGB(format, nr, ng, nb);
+            }
+
+        }
+    }
+
+    SDL_UnlockSurface(surface);
+} 
+
 int main(int argc, char** argv)
 {
     // Checks the number of arguments.
@@ -239,11 +345,15 @@ int main(int argc, char** argv)
 
     hough(surface);
 
+    SDL_Texture* textureHough = SDL_CreateTextureFromSurface(renderer, surface);
+    if (textureGray == NULL)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+
     SDL_FreeSurface(surface);
 
 
 
-    //event_loop(renderer,textureColored, textureGray);
+    event_loop(renderer,textureColored, textureGray, textureHough);
 
 
 
@@ -257,127 +367,5 @@ int main(int argc, char** argv)
     return EXIT_SUCCESS;
 }
 
-void houghTransform(SDL_Surface *surface){
-    Uint32* pixels = surface->pixels;
-    int width = surface->w;
-    int height = surface->h;
-    int len = width * height;
-    SDL_PixelFormat* format = surface->format;
-    Uint32* acc = calloc(len, len*sizeof(Uint32));
 
 
-    for(size_t x = 0; x < width; x++){
-        for(size_t y = 0; y < height; y++){
-            for(int teta = 0; teta < 180; teta += 5){
-                int rho = x*cos(teta) + y*sin(teta);
-                acc[rho+width*teta] ++;
-            }
-        }
-    }
-}
-
-
-void hough(SDL_Surface *surface)
-{
-    
-    Uint32* pixels = surface->pixels;
-    unsigned int width = surface->w;
-    unsigned int height = surface->h;
-    
-    unsigned int rho, theta;
-    rho = sqrt(width * width + height * height);
-    unsigned int p;
-    theta = 90;
-
-    //initialise accumulator array
-    unsigned int acc[rho][theta];
-    
-    for (size_t i = 0; i < rho; i++)
-    {
-        for (size_t j = 0; j < theta; j++)
-            acc[i][j] = 0;
-    }
-    printf("%u\n", height);
-
-
-    Uint32 pixel;
-    Uint8 r, g, b;
-
-    //go through each pixels
-    for (size_t x = 0; x < width; x++)
-    {
-        for (size_t y = 0; y < height; y++)
-        {
-            //printf("testing pixel #%zu\n", x+y*width);
-            pixel = pixels[x+y*width];
-            SDL_GetRGB(pixel, surface->format, &r, &g, &b);
-
-            
-
-            //if white
-            if (r+g+b >= 400)
-            {
-                
-                
-                t = 0;
-                p = x*cos(t*M_PI/180) + y*sin(t*M_PI/180);
-                //printf("testing pixel #%zu to acc value %zu,%i\n",x+y*width, p, t);
-                acc[p][t]++;
-                t = 90;
-                p = x*cos(t*M_PI/180) + y*sin(t*M_PI/180);
-                //printf("testing pixel #%zu to acc value %zu,%i\n",x+y*width, p, t);
-                acc[p][t]++;
-            }
-        }
-    }
-    
-    unsigned int intersect[width*height];
-    unsigned int vertical[p/9];
-    unsigned int horizontal[p/9];
-
-    for(p = 0; p < rho; p += 9){
-        unsigned int moyenne = 0;
-        unsigned int ecart = 0;
-        
-        for(size_t i = p; i< p+9; i++){
-            moyenne += acc[i][0]
-        }
-        moyenne /= 9
-
-        for(i=0; i<9; i++){
-            ecart += (acc[p+i][0]+moyenne)*(acc[p+i][0]+moyenne)
-        }
-        ecart /= 9;
-        ecart = sqrt(ecart);
-        if(moyenne > 90 && ecart < 50){
-            horizontal[p/9] = 1
-        }
-
-        moyenne = 0;
-        ecart = 0;
-        
-        for(size_t i = p; i< p+9; i++){
-            moyenne += acc[i][90]
-        }
-        moyenne /= 9
-
-        for(i=0; i<9; i++){
-            ecart += (acc[p+i][0]+moyenne)*(acc[p+i][0]+moyenne)
-        }
-        ecart /= 9;
-        ecart = sqrt(ecart);
-        if(moyenne > 90 && ecart < 50){
-            vertical[p/9] = 1
-        }
-    }
-
-    for(size_t i = 0; i < p/9; i++){
-        if(vertical[i] == 1){
-            for(size_t j = 0; j < p/9; j++){
-                if (horizontal[j] == 1){
-                    intersect[i*9+j*9*width] = 1;
-                }
-            }
-        }
-    }
-}
