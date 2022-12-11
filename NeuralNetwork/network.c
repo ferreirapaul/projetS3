@@ -63,13 +63,15 @@ void forwardOut(struct Neuron *networkHidden, struct Neuron *networkOut)
     softmax(networkOut);
 }
 
-void forward(char *input, struct Neuron *networkHidden, struct Neuron *networkOut)
+void forward(char *input, struct Neuron *networkHidden, 
+        struct Neuron *networkOut)
 {
     forwardHidden(input,networkHidden);
     forwardOut(networkHidden, networkOut);
 }
 
-void backward(char *input, double *output, struct Neuron *networkHidden, struct Neuron *networkOut)
+void backward(char *input, double *output, struct Neuron *networkHidden, 
+        struct Neuron *networkOut)
 {
     double errorTemp = 0.0;
     for(size_t i = 0; i < 9; i++)
@@ -92,12 +94,14 @@ void backward(char *input, double *output, struct Neuron *networkHidden, struct 
     {
         for(size_t j = 0; j < SIZE; j++)
         {
-            networkHidden[i].weights[j] += networkHidden[i].delta * input[j] * 0.01;
+            networkHidden[i].weights[j] += networkHidden[i].delta * 
+                input[j] * 0.01;
         }
 
         for(size_t j = 0; j < 9; j++)
         {
-            networkOut[i].weights[j] += networkHidden[j].res * networkOut[i].delta * 0.01;
+            networkOut[i].weights[j] += networkHidden[j].res * 
+                networkOut[i].delta * 0.01;
         }
     }
 }
@@ -256,7 +260,8 @@ void save_weights(struct Neuron *networkHidden, struct Neuron *networkOut)
     fclose(f);
 }
 
-void load_weights(char *path, struct Neuron *networkHidden, struct Neuron *networkOut)
+void load_weights(char *path, struct Neuron *networkHidden, 
+        struct Neuron *networkOut)
 {
     init_in(networkHidden);
     init_in(networkOut);
@@ -299,7 +304,8 @@ void load_weights(char *path, struct Neuron *networkHidden, struct Neuron *netwo
     }
 }
 
-char network(char *input, struct Neuron *networkHidden, struct Neuron *networkOut, int isInit)
+char network(char *input, struct Neuron *networkHidden, 
+        struct Neuron *networkOut, int isInit)
 {
     if(!isInit)
     {

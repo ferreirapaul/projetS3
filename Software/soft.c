@@ -247,7 +247,8 @@ void init_soft(int argc, char *argv[])
     file = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object (builder, "file"));
     g_signal_connect(file, "file-set", G_CALLBACK(file_choosed), NULL); 
 
-    weight = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object (builder, "LoadNet"));
+    weight = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object (builder, 
+                "LoadNet"));
     g_signal_connect(weight, "file-set", G_CALLBACK(weight_choosed), &net); 
     
     

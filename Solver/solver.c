@@ -134,7 +134,9 @@ unsigned int check(char **grid, size_t x, size_t y)
 
 
 unsigned int __solve(char **grid, size_t x, size_t y)
-{   //recursive fonction that solve the board return false when no solutions are possible
+{   
+//recursive fonction that solve the board return false when no 
+//solutions are possible
     if(x == 9)
     {
         if(y == 8)

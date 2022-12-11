@@ -64,7 +64,8 @@ SDL_Surface **load_training()
 
 
 
-void put_surface(SDL_Surface **numbers, SDL_Surface *surface, int  *x, int *y, char n)
+void put_surface(SDL_Surface **numbers, SDL_Surface *surface, int  *x, int *y, 
+        char n)
 {
     SDL_Surface *number = numbers[n-1];
 
