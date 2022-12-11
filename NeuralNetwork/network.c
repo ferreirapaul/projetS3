@@ -103,18 +103,6 @@ void backward(char *input, double *output, struct Neuron *networkHidden, struct 
 }
 
 
-void learn(char input[9][SIZE],double output[9][9],struct Neuron *networkHidden, struct Neuron *networkOut)
-{
-    for(size_t j = 0; j < 20000;j++)
-    {
-        //printf("%li\n",j);
-        for(size_t i = 0; i < 9; i++)
-        {
-            forward(input[i],networkHidden,networkOut);
-            backward(input[i],output[i],networkHidden,networkOut);
-        }
-    }
-}
 
 void init_in(struct Neuron *network)
 {
@@ -145,36 +133,42 @@ void init_out(struct Neuron *network)
     }
 }
 
-void printChar(char list[9][9])
+void printChar(char input[9][SIZE])
 {
-    for(size_t i = 0; i < 9; i++)
+    for(size_t t = 0; t < 9; t++)
     {
-        for(size_t j = 0; j < 9; j++)
+        for(size_t i = 0; i < 9; i++)
         {
-            printf("%i",list[i][j]);
+            for(size_t j = 0; j < 9; j++)
+            {
+                printf("%i",input[t][i*9 + j]);
+            }
+            printf("\n");
         }
-        printf("\n");
+        printf("\n\n");
     }
-    printf("\n\n");
 }
 
 
-size_t max(struct Neuron *net)
+char max(struct Neuron *net)
 {
-    size_t res = 0;
+    char res = 0;
+    size_t j = 0;
     //printf("%f\n",net[0].res);
     for(size_t i = 1; i < 9; i++)
     {
         //printf("%f\n",net[i].res);
-        if(net[i].res > net[res].res)
+        if(net[i].res > net[j].res)
         {
-            res = i;
+            res =(char) i;
+            j = i;
         }
     }
     return res;
 }
 
-void createInput(char input[9][SIZE], SDL_Surface **training)
+
+void createInput(char input[9][SIZE],SDL_Surface **training)
 {
     SDL_Surface *c;
     for (size_t i = 0; i < 9; i++)
@@ -189,7 +183,7 @@ void createInput(char input[9][SIZE], SDL_Surface **training)
             SDL_GetRGB(pixels[j], format,&r,&g,&b);
             if(r == 0 && b == 0 && g == 0)
             {
-                input[i][j] = 1;
+                input[i][j] = 2;
             }
         }
     }
@@ -203,10 +197,12 @@ void free_neuron(struct Neuron *net)
     }
 }
 
-void network()
-{
-    struct Neuron networkHidden[9];
-    struct Neuron networkOut[9];
+
+void learn(struct Neuron *networkHidden, struct Neuron *networkOut)
+{   
+    srand(time(NULL));
+    init_in(networkHidden);
+    init_in(networkOut);
     double output[9][9] = {
         {1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
         {0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
@@ -217,42 +213,100 @@ void network()
         {0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0},
         {0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0},
         {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0},
-    };/*
-    char output[9][9] = {
-        {1,-1,-1,-1,-1,-1,-1,-1,-1},
-        {-1,1,-1,-1,-1,-1,-1,-1,-1},
-        {-1,-1,1,-1,-1,-1,-1,-1,-1},
-        {-1,-1,-1,1,-1,-1,-1,-1,-1},
-        {-1,-1,-1,-1,1,-1,-1,-1,-1},
-        {-1,-1,-1,-1,-1,1,-1,-1,-1},
-        {-1,-1,-1,-1,-1,-1,1,-1,-1},
-        {-1,-1,-1,-1,-1,-1,-1,1,-1},
-        {-1,-1,-1,-1,-1,-1,-1,-1,1},
-    };*/
-
-    SDL_Surface **training = load_numbers();
-    char input[9][SIZE];
+    };
     
-    srand(time(NULL));
+    SDL_Surface **training = load_training();
+    char input[9][SIZE]; 
     createInput(input,training);
-    init_in(networkHidden);
-    init_in(networkOut);
-    learn(input,output,networkHidden,networkOut);
-    
-    for(size_t i = 0; i < 9; i++)
+
+    for(size_t j = 0; j < 20000;j++)
     {
-        forward(input[i],networkHidden,networkOut);
-        printf("%li,%li\n",i+1,max(networkOut)+1);
+        //printf("%li\n",j);
+        for(size_t i = 0; i < 9; i++)
+        {
+            forward(input[i],networkHidden,networkOut);
+            backward(input[i],output[i],networkHidden,networkOut);
+        }
     }
 
     free_numbers(training);
-    free_neuron(networkHidden);
-    free_neuron(networkOut);
 }
 
 
-int main()
+void save_weights(struct Neuron *networkHidden, struct Neuron *networkOut)
 {
-    network();
-    return 1;
+    learn(networkHidden,networkOut);
+
+    FILE *f = fopen("network.weights","w");
+    //fprintf(f,"######NEURAL NETWORK######\n");
+    for(size_t i = 0; i < 9; i++)
+    {
+        //fprintf(f,"Neurons : %li\nHidden:\n",i);
+        for(size_t j = 0; j < SIZE;j++)
+        {
+            fprintf(f,"%f ",networkHidden[i].weights[j]);
+        }
+       // fprintf(f,"\nOut:\n");
+        for(size_t j = 0; j < 9;j++)
+        {
+            fprintf(f,"%f ",networkOut[i].weights[j]);
+        }
+        //fprintf(f,"\n");
+    }
+    fclose(f);
+}
+
+void load_weights(char *path, struct Neuron *networkHidden, struct Neuron *networkOut)
+{
+    init_in(networkHidden);
+    init_in(networkOut);
+    FILE *f = fopen(path,"r");
+
+    if(f == NULL)
+    {
+        errx(EXIT_FAILURE,"error in the opening of the file");
+    }
+
+    size_t i = 0;
+    size_t j = 0;
+    int isHidden = 1;
+    double x;
+    while(i < 9 && fscanf(f, "%lf ",&x))
+    {
+        if(isHidden && j >= SIZE)
+        {
+            j = 0;
+            isHidden = 0;
+        }
+
+        if(isHidden)
+        {
+            networkHidden[i].weights[j] = x;
+        }
+        else
+        {
+            networkOut[i].weights[j] = x;
+        }
+        j++;
+        
+        if(!isHidden && j >= 9)
+        {
+            j = 0;
+            i++;
+            isHidden = 1;
+        }
+
+    }
+}
+
+char network(char *input, struct Neuron *networkHidden, struct Neuron *networkOut, int isInit)
+{
+    if(!isInit)
+    {
+        learn(networkHidden, networkOut);
+    }
+
+    forward(input,networkHidden,networkOut);
+    return max(networkOut)+1;
+
 }

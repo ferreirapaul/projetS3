@@ -17,7 +17,7 @@ void printBoard(char **grid)
 unsigned int lineCheck(char **grid, char* list, size_t x, size_t y, size_t j)
 {
     unsigned int res = 1;
-    int t = 0;
+    size_t t = 0;
     while(t<j && res)
     {
         if(grid[y][x] == list[t] && grid[y][x] != 0)

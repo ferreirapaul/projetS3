@@ -1,5 +1,6 @@
 #include "soft.h"
 #include "../Solver/solver.h"
+#include "../NeuralNetwork/network.h"
 #include "build_result.h"
 
 GtkBuilder *builder;
@@ -70,6 +71,32 @@ void load_img(SDL_Surface *surface)
     g_object_unref(pixbuf);
 }
 
+void weight_choosed(GtkFileChooser *button, gpointer data)
+{
+    gchar *path;
+
+    path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(button));
+    char* ext = get_ext(path);
+    struct Network *net = data;
+    
+    if(strcmp(ext, "weights") == 0)
+    {
+        load_weights(path, net->networkHidden, net->networkOut);
+        net->isInit = 1;
+    }
+    else
+    {
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, 
+            "The selected file isn't in the good format");
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+    }
+    g_free(path);
+}
+
+
 void file_choosed(GtkFileChooser *button)
 {
     gchar *path;
@@ -98,6 +125,7 @@ void file_choosed(GtkFileChooser *button)
     }
     g_free(path);
 }
+
 
 void rotate(double degree)
 {
@@ -146,7 +174,28 @@ void free_grid(char **grid)
     free(grid);
 }
 
-void start_process(GtkButton *self)
+void process(struct Network *net)
+{
+    SDL_Surface **training = load_training();
+    char input[9][SIZE];
+    createInput(input,training);
+    char x;
+    printf("Network :\n");
+    for(size_t i = 0; i < 9; i++)
+    {
+        //printChar(input[i]);
+        x = network(input[i], net->networkHidden, net->networkOut, net->isInit);
+        if(!net->isInit)
+        {
+            net->isInit = 1;
+        }
+        printf("Resultat : In: %li, Out : %i\n",i+1,x);
+    }
+
+    free_numbers(training);
+}
+
+void start_process(GtkButton *self,gpointer data)
 {
     if(strcmp(gtk_button_get_label(self),"Save"))
     {
@@ -156,6 +205,8 @@ void start_process(GtkButton *self)
         load_img(res);
         free_grid(grid);
         gtk_button_set_label(self, "Save");
+        struct Network *net = data;
+        process(net);
     }
     else
     {
@@ -163,11 +214,26 @@ void start_process(GtkButton *self)
     }
 }
 
+void save_process(GtkButton *self, gpointer data)
+{
+    gtk_widget_set_sensitive(GTK_WIDGET(self),FALSE);
+    struct Network *net = data;
+    save_weights(net->networkHidden, net->networkOut);
+    net->isInit = 1;
+}
+
 void init_soft(int argc, char *argv[])
 {
+    struct Neuron networkHidden[9];
+    struct Neuron networkOut[9];
+
+    struct Network net = {networkHidden, networkOut,0};
+
     GtkFileChooserButton *file;
+    GtkFileChooserButton *weight;
     GtkSpinButton *buttonSpin;
     GtkButton *buttonStart;
+    GtkButton *buttonSave;
 
     SDL_Init(SDL_INIT_VIDEO);
     gtk_init (&argc, &argv);
@@ -180,6 +246,10 @@ void init_soft(int argc, char *argv[])
     
     file = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object (builder, "file"));
     g_signal_connect(file, "file-set", G_CALLBACK(file_choosed), NULL); 
+
+    weight = GTK_FILE_CHOOSER_BUTTON(gtk_builder_get_object (builder, "LoadNet"));
+    g_signal_connect(weight, "file-set", G_CALLBACK(weight_choosed), &net); 
+    
     
     buttonSpin = GTK_SPIN_BUTTON(gtk_builder_get_object(builder,"spin"));
     g_signal_connect(buttonSpin, "value-changed", G_CALLBACK(init_rotate),
@@ -187,13 +257,23 @@ void init_soft(int argc, char *argv[])
 
     buttonStart = GTK_BUTTON(gtk_builder_get_object(builder,"start"));
     g_signal_connect(buttonStart, "clicked", G_CALLBACK(start_process),
-            NULL);
+            &net);
+
+    buttonSave = GTK_BUTTON(gtk_builder_get_object(builder,"SaveNet"));
+    g_signal_connect(buttonSave, "clicked", G_CALLBACK(save_process),
+            &net);
 
     gtk_widget_show (window);
 
     gtk_main ();
 
     g_object_unref(builder);
+
+    if(net.isInit)
+    {
+        free_neuron(net.networkHidden);
+        free_neuron(net.networkOut);
+    }
 
     if(surface != NULL)
     {

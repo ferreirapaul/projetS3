@@ -35,6 +35,34 @@ SDL_Surface **load_numbers()
     return numbers;
 }
 
+SDL_Surface **load_training()
+{
+    SDL_Surface **training= malloc(9*sizeof(void *));
+    char paths[][80] = {
+        "../Image/training/training_1.png",
+        "../Image/training/training_2.png",
+        "../Image/training/training_3.png",
+        "../Image/training/training_4.png",
+        "../Image/training/training_5.png",
+        "../Image/training/training_6.png",
+        "../Image/training/training_7.png",
+        "../Image/training/training_8.png",
+        "../Image/training/training_9.png",
+    };
+
+    for(size_t i = 0; i < 9; i++)
+    {
+        training[i] = load_surface(paths[i]);
+        if(training[i] == NULL)
+        {
+            printf("eerr\n");
+        }
+    }
+
+    return training;
+}
+
+
 
 void put_surface(SDL_Surface **numbers, SDL_Surface *surface, int  *x, int *y, char n)
 {

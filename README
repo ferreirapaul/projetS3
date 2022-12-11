@@ -1,9 +1,22 @@
 Projet S3
 
-Each folder has is own Makefile, for the time being, every part of the project is not connected.
+Each part as is own makefile expect for the Neural Network.
+The software, neural network and solver are connected by the software.
 
-For instance, if you want to test the sofware you have to go to the Software directory and write:
+For instance to execute them you have to go to the software directory.
 
+cd Software 
 make
 ./main
 
+In this software you can save the weight of the network or load them.
+You can start, it will show you a grid of the solved exemple of sudoku and the 
+result of the neural network for each numbers.
+
+The grid detection is not linked because it doesn't work.
+you have to go to the ImageSystems directory and:
+
+make 
+./grid_detection "name of the picture"
+
+It will show you the Hought transformation.
