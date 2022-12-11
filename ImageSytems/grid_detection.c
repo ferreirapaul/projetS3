@@ -286,6 +286,7 @@ void hough(SDL_Surface *surface)
     
     unsigned int rho, theta;
     rho = sqrt(width * width + height * height);
+    unsigned int p;
     theta = 90;
 
     //initialise accumulator array
@@ -317,23 +318,66 @@ void hough(SDL_Surface *surface)
             if (r+g+b >= 400)
             {
                 
-                //p = x*cos(t) + y*sin(t)
-                //check for every t
-                for (int t = 0; t < 90;t++)
-                {
-
-                    unsigned int p = x*cos(t*M_PI/180) + y*sin(t*M_PI/180);
-                    //printf("testing pixel #%zu to acc value %zu,%i\n",x+y*width, p, t);
-                    acc[p][t]++;
-                }
+                
+                t = 0;
+                p = x*cos(t*M_PI/180) + y*sin(t*M_PI/180);
+                //printf("testing pixel #%zu to acc value %zu,%i\n",x+y*width, p, t);
+                acc[p][t]++;
+                t = 90;
+                p = x*cos(t*M_PI/180) + y*sin(t*M_PI/180);
+                //printf("testing pixel #%zu to acc value %zu,%i\n",x+y*width, p, t);
+                acc[p][t]++;
             }
         }
     }
     
-    for(int x = 0; x < rho; x++ ){
-        for(int y = 0; y < theta; y++){
-            printf("| %u ", acc[x][y]);
+    unsigned int intersect[width*height];
+    unsigned int vertical[p/9];
+    unsigned int horizontal[p/9];
+
+    for(p = 0; p < rho; p += 9){
+        unsigned int moyenne = 0;
+        unsigned int ecart = 0;
+        
+        for(size_t i = p; i< p+9; i++){
+            moyenne += acc[i][0]
         }
-        printf("|\n");
+        moyenne /= 9
+
+        for(i=0; i<9; i++){
+            ecart += (acc[p+i][0]+moyenne)*(acc[p+i][0]+moyenne)
+        }
+        ecart /= 9;
+        ecart = sqrt(ecart);
+        if(moyenne > 90 && ecart < 50){
+            horizontal[p/9] = 1
+        }
+
+        moyenne = 0;
+        ecart = 0;
+        
+        for(size_t i = p; i< p+9; i++){
+            moyenne += acc[i][90]
+        }
+        moyenne /= 9
+
+        for(i=0; i<9; i++){
+            ecart += (acc[p+i][0]+moyenne)*(acc[p+i][0]+moyenne)
+        }
+        ecart /= 9;
+        ecart = sqrt(ecart);
+        if(moyenne > 90 && ecart < 50){
+            vertical[p/9] = 1
+        }
+    }
+
+    for(size_t i = 0; i < p/9; i++){
+        if(vertical[i] == 1){
+            for(size_t j = 0; j < p/9; j++){
+                if (horizontal[j] == 1){
+                    intersect[i*9+j*9*width] = 1;
+                }
+            }
+        }
     }
 }
