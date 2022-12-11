@@ -130,7 +130,7 @@ int max(int a, int b)
     return max;
 }
  
-void hough(SDL_Surface *surface)
+SDL_Surface* hough(SDL_Surface *surface)
 {
     
     Uint32* pixels = surface->pixels;
@@ -233,8 +233,22 @@ void hough(SDL_Surface *surface)
         }
     }
 
-    SDL_PixelFormat* format = surface->format;
-    SDL_LockSurface(surface);
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            printf("| %u ", intersect[x + y*width]);
+        }
+        printf("| \n");
+    }
+    printf("\n");
+    
+
+    SDL_Surface *houghSurface = SDL_CreateRGBSurface(0,width,height,32,0,0,0,0);
+    SDL_PixelFormat* format = houghSurface->format;
+    Uint32* graph = houghSurface->pixels;
+
+    SDL_LockSurface(houghSurface);
     Uint32 nr;
     Uint32 ng;
     Uint32 nb;
@@ -251,42 +265,75 @@ void hough(SDL_Surface *surface)
 
             if (nr == 255)
             {
-                /*pixels[(x-2) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x-2) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x-2) + y * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x-2) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x-2) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x-1) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x-1) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x-1) + y * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x-1) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x-1) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[x + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[x + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[x + y * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[x + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[x + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x+1) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x+1) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x+1) + y * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x+1) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x+1) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x+2) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x+2) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x+2) + y * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x+2) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
-                pixels[(x+2) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);*/
+                 if(x-2 > 0){
+                    if(y-2 > 0)
+                        graph[(x-2) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y-1 > 0)
+                        graph[(x-2) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    graph[(x-2) + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y+1 < height)
+                        graph[(x-2) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y+2 < height)
+                        graph[(x-2) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                }
+
+                if(x-1 > 0){
+                    if(y-2 > 0)
+                        graph[(x-1) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y-1 > 0)
+                        graph[(x-1) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    graph[(x-1) + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y+1 < height)
+                        graph[(x-1) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y+2 < height)
+                        graph[(x-1) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                }
+                
+                if(y-2 > 0)
+                    graph[x + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                if(y-1 > 0)
+                    graph[x + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                graph[x + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                if(y+1 < height)
+                    graph[x + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                if(y+2 < height)
+                    graph[x + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                     if(x+1 < width){
+                    if(y-2 > 0)
+                        graph[(x+1) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y-1 > 0)
+                        graph[(x+1) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    graph[(x+1) + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y+1 < height)
+                        graph[(x+1) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y+2 < height)
+                        graph[(x+1) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                }
+
+                if(x+2 < width){
+                    if(y-2 > 0)
+                        graph[(x+2) + (y-2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y-1 > 0)
+                        graph[(x+2) + (y-1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    graph[(x+2) + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y+1 < height)
+                        graph[(x+2) + (y+1) * width] = SDL_MapRGB(format, nr, ng, nb);
+                    if(y+2 < height)
+                        graph[(x+2) + (y+2) * width] = SDL_MapRGB(format, nr, ng, nb);
+                }
                 
             }
             else
             {
-                pixels[x + y * width] = SDL_MapRGB(format, nr, ng, nb);
+                graph[x + y * width] = SDL_MapRGB(format, nr, ng, nb);
             }
 
         }
     }
 
-    SDL_UnlockSurface(surface);
+    SDL_UnlockSurface(houghSurface);
+
+    return houghSurface;
 } 
 
 int main(int argc, char** argv)
@@ -343,13 +390,14 @@ int main(int argc, char** argv)
     if (textureGray == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
-    hough(surface);
+    SDL_Surface* houghSurface = hough(surface);
 
-    SDL_Texture* textureHough = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Texture* textureHough = SDL_CreateTextureFromSurface(renderer, houghSurface);
     if (textureGray == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
     SDL_FreeSurface(surface);
+    SDL_FreeSurface(houghSurface);
 
 
 
