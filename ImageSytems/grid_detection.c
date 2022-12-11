@@ -140,7 +140,7 @@ SDL_Surface* hough(SDL_Surface *surface)
     unsigned int rho, theta;
     rho = sqrt(width * width + height * height);
     unsigned int p;
-    theta = 90;
+    theta = 91;
 
     //initialise accumulator array
     unsigned int acc[rho][theta];
@@ -150,7 +150,7 @@ SDL_Surface* hough(SDL_Surface *surface)
         for (size_t j = 0; j < theta; j++)
             acc[i][j] = 0;
     }
-    printf("%u\n", height);
+    //printf("%u\n", height);
 
 
     Uint32 pixel;
@@ -201,8 +201,9 @@ SDL_Surface* hough(SDL_Surface *surface)
         }
         ecart /= 9;
         ecart = sqrt(ecart);
-        if(moyenne > 90 && ecart < 50){
+        if(moyenne > 600 /*&& ecart < 50*/){
             horizontal[p/9] = 1;
+            //printf("j'ai mis un 1 dans horizontal");
         }
 
         moyenne = 0;
@@ -218,10 +219,29 @@ SDL_Surface* hough(SDL_Surface *surface)
         }
         ecart /= 9;
         ecart = sqrt(ecart);
-        if(moyenne > 90 && ecart < 50){
+        if(moyenne > 600 /*&& ecart < 50*/){
             vertical[p/9] = 1;
+            //printf("j'ai mis un 1 dans vertical");
         }
     }
+
+    /*for (size_t i = 0; p < rho/9; i++)
+    {
+        if (vertical[i] == 1)
+        {
+            printf("Vertical:");
+            printf("| %u |", vertical[i]);
+            printf("i: %zu", i);
+            printf("\n");
+        }
+        if (horizontal[i] == 1)
+        {
+            printf("Horizontal:");
+            printf("| %u |", horizontal[i]);
+            printf("i: %zu", i);
+            printf("\n");
+        }
+    }*/
 
     for(size_t i = 0; i < rho/9; i++){
         if(vertical[i] == 1){
@@ -233,15 +253,18 @@ SDL_Surface* hough(SDL_Surface *surface)
         }
     }
 
-    for (int x = 0; x < width; x++)
+    /*for (int x = 0; x < width; x++)
     {
         for (int y = 0; y < height; y++)
         {
-            printf("| %u ", intersect[x + y*width]);
+            if (intersect[x +y*width] == 255)
+            {
+                printf("| %u |", intersect[x + y*width]);
+                printf("x:%i, y:%i", x, y);
+                printf("\n");
+            }
         }
-        printf("| \n");
-    }
-    printf("\n");
+    }*/
     
 
     SDL_Surface *houghSurface = SDL_CreateRGBSurface(0,width,height,32,0,0,0,0);
